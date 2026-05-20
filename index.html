@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AWS Serverless Deployment Demo</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: white;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .container {
+      width: 420px;
+      background: #1e293b;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.45);
+    }
+
+    h1 {
+      text-align: center;
+      color: #38bdf8;
+    }
+
+    p {
+      text-align: center;
+      color: #cbd5e1;
+    }
+
+    input, button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 12px;
+      border-radius: 8px;
+      border: none;
+      font-size: 15px;
+    }
+
+    button {
+      background: #38bdf8;
+      color: #020617;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #0ea5e9;
+    }
+
+    .message {
+      margin-top: 15px;
+      text-align: center;
+      color: #22c55e;
+      font-weight: bold;
+    }
+
+    .data-box {
+      margin-top: 20px;
+      background: #020617;
+      padding: 15px;
+      border-radius: 10px;
+    }
+
+    .student {
+      border-bottom: 1px solid #334155;
+      padding: 8px 0;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>Serverless Student App</h1>
+    <p>Frontend demo without API Gateway</p>
+
+    <input type="text" id="name" placeholder="Enter student name" />
+    <input type="email" id="email" placeholder="Enter student email" />
+
+    <button onclick="saveStudent()">Save Student</button>
+    <button onclick="clearStudents()">Clear Data</button>
+
+    <div class="message" id="message"></div>
+
+    <div class="data-box">
+      <h3>Stored Students</h3>
+      <div id="studentList"></div>
+    </div>
+  </div>
+
+  <script>
+    function getStudents() {
+      return JSON.parse(localStorage.getItem("students")) || [];
+    }
+
+    function saveStudent() {
+      const name = document.getElementById("name").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const message = document.getElementById("message");
+
+      if (name === "" || email === "") {
+        message.style.color = "#ef4444";
+        message.innerText = "Please fill all fields";
+        return;
+      }
+
+      const students = getStudents();
+
+      students.push({
+        name: name,
+        email: email,
+        date: new Date().toLocaleString()
+      });
+
+      localStorage.setItem("students", JSON.stringify(students));
+
+      document.getElementById("name").value = "";
+      document.getElementById("email").value = "";
+
+      message.style.color = "#22c55e";
+      message.innerText = "Student saved successfully";
+
+      displayStudents();
+    }
+
+    function displayStudents() {
+      const students = getStudents();
+      const studentList = document.getElementById("studentList");
+
+      if (students.length === 0) {
+        studentList.innerHTML = "<p>No students added yet.</p>";
+        return;
+      }
+
+      studentList.innerHTML = "";
+
+      students.forEach(function(student, index) {
+        studentList.innerHTML += `
+          <div class="student">
+            <strong>${index + 1}. ${student.name}</strong><br>
+            Email: ${student.email}<br>
+            Added: ${student.date}
+          </div>
+        `;
+      });
+    }
+
+    function clearStudents() {
+      localStorage.removeItem("students");
+      document.getElementById("message").innerText = "All data cleared";
+      displayStudents();
+    }
+
+    displayStudents();
+  </script>
+</body>
+</html>
